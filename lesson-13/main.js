@@ -6,11 +6,36 @@ const port = 3000,
   layouts = require("express-ejs-layouts"),
   homeController = require("./controllers/homeController"),
   errorController = require("./controllers/errorController"),
-  app = express();
-  // @TODO: 몽고DB 모듈의 요청
+  app = express(),
+  MongoDB = require("mongodb").MongoClient, // @TODO: 몽고DB 모듈의 요청
+  dbURL = "mongodb://localhost:27017/",
+  dbName = "recipe_db";
 
 // @TODO: 로컬 MongoDB 데이터베이스 서버 연결 설정
+MongoDB.connect(dbURL, (error, client) => {
+  if (error) throw error;
+  let db = client.db(dbName); // 몽고 DB 서버로의 recipe_db 데이터베이스 연결 취득
+  db.collection("contacts")
+    .find()
+    .toArray((error, data) => {
+      // contacts 컬렉션의 모든 레코드 찾기
+      if (error) throw error;
+      console.log(data); // 콘솔에 결과 출력
+    });
 
+  db.collection("contacts").insertOne(
+    {
+      name: "Eunmi",
+      relationship: "Mother",
+      location: "Cheonan",
+    },
+    (error, result) => {
+      // 데이터베이스에 새 정보 삽입
+      if (error) throw error;
+      console.log(result); // 삽입 결과 출력
+    }
+  );
+});
 
 app.set("port", process.env.PORT || port);
 app.set("view engine", "ejs");
